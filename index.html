@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Glyph Tide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="stage" id="stage">
+    <section class="card" id="card">
+      <header>
+        <h1>Glyph Tide</h1>
+        <p>Click the field to send a ripple. Hold <kbd>⇧ Shift</kbd> or <kbd id="alt-key">⌥ Option</kbd> while clicking for a heart.</p>
+      </header>
+
+      <div class="controls">
+        <div class="control">
+          <label for="windSpeed">Wind</label>
+          <input type="range" id="windSpeed" min="0" max="160" step="2" value="36">
+          <output for="windSpeed" data-unit="px/s"></output>
+        </div>
+        <div class="control">
+          <label for="gustSize">Gust size</label>
+          <input type="range" id="gustSize" min="120" max="1200" step="20" value="420">
+          <output for="gustSize" data-unit="px"></output>
+        </div>
+        <div class="control">
+          <label for="peak">Gust contrast</label>
+          <input type="range" id="peak" min="0.2" max="1" step="0.02" value="0.8">
+          <output for="peak" data-unit=""></output>
+        </div>
+        <div class="control">
+          <label for="flick">Flicker</label>
+          <input type="range" id="flick" min="0" max="4" step="0.1" value="1.2">
+          <output for="flick" data-unit="/s"></output>
+        </div>
+        <div class="control">
+          <label for="friction">Edge light</label>
+          <input type="range" id="friction" min="0" max="1" step="0.05" value="0.6">
+          <output for="friction" data-unit=""></output>
+        </div>
+        <div class="control">
+          <label for="ripple">Ripple</label>
+          <input type="range" id="ripple" min="0" max="2" step="0.05" value="1">
+          <output for="ripple" data-unit="×"></output>
+        </div>
+        <div class="control">
+          <label for="cell">Character</label>
+          <input type="range" id="cell" min="5" max="14" step="0.5" value="6.5">
+          <output for="cell" data-unit="px"></output>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="primary" id="drop">Drop a ripple</button>
+        <button type="button" id="theme">Theme: system</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="glyph-tide.js"></script>
+  <script>
+    const stage = document.getElementById('stage');
+    const mac = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform);
+    if (!mac) document.getElementById('alt-key').textContent = 'Alt';
+    const tide = GlyphTide.mount(stage, { calm: '#card' });
+
+    document.querySelectorAll('.control input').forEach((input) => {
+      const out = input.parentElement.querySelector('output');
+      const show = () => { out.textContent = input.value + (out.dataset.unit ? ' ' + out.dataset.unit : ''); };
+      input.addEventListener('input', () => {
+        show();
+        tide.set({ [input.id]: Number(input.value) });
+      });
+      show();
+    });
+
+    document.getElementById('drop').addEventListener('click', () => {
+      const w = stage.clientWidth, h = stage.clientHeight;
+      tide.ripple(w * (0.15 + Math.random() * 0.7), h * (0.15 + Math.random() * 0.7));
+    });
+
+    const themes = ['system', 'light', 'dark'];
+    const themeBtn = document.getElementById('theme');
+    themeBtn.addEventListener('click', () => {
+      const next = themes[(themes.indexOf(themeBtn.dataset.theme || 'system') + 1) % themes.length];
+      themeBtn.dataset.theme = next;
+      themeBtn.textContent = 'Theme: ' + next;
+      if (next === 'system') delete document.documentElement.dataset.theme;
+      else document.documentElement.dataset.theme = next;
+    });
+
+    setTimeout(() => tide.ripple(stage.clientWidth * 0.28, stage.clientHeight * 0.4), 700);
+  </script>
+</body>
+</html>
