@@ -4,6 +4,10 @@ A field of random characters that behaves like wind over water. Click for a ripp
 
 Inspired by the New session background in the Claude desktop app. No dependencies, needs WebGL2.
 
+## Preview
+
+https://starx.github.io/Glyph-Tide/
+
 ## Run
 
 Open `index.html`.
